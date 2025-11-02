@@ -1,720 +1,508 @@
-import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { FiArrowRight, FiGithub, FiLinkedin, FiTwitter, FiUsers, FiBook, FiCode, FiX, FiMenu } from 'react-icons/fi';
-import Particles from 'react-tsparticles';
-import { loadFull } from 'tsparticles';
-import madam from '../assets/madam.jpeg?w=800&format=webp';
+import React, { useState, useEffect } from 'react';
+import { Menu, X, Linkedin, Mail, ChevronDown, Globe, Users, Briefcase, Award, ArrowRight, Star } from 'lucide-react';
+import pic1 from '../assets/madam.jpeg';
 
-// Lazy-loaded components
-const StellarAssistant = lazy(() => import('../components/StellarAssistant'));
-const Countdown = lazy(() => import('react-countdown'));
-const TwitterFeed = lazy(() => import('../components/TwitterFeed'));
-
-const LandingPage = () => {
-  const [activeSection, setActiveSection] = useState('home');
+export default function Portfolio() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [welcomeMessage, setWelcomeMessage] = useState('Welcome Stellar Enthusiast!');
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({ container: containerRef });
-  const x = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const [activeSection, setActiveSection] = useState('home');
 
-  // Geolocation detection
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const country = getMockCountry(position.coords);
-          setWelcomeMessage(`Hello from ${country || 'East Africa'}!`);
-        },
-        () => setWelcomeMessage('Welcome Stellar Enthusiast!')
-      );
-    }
-  }, []);
-
-  // Scroll handler
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
+      
+      const sections = ['home', 'about', 'leadership', 'impact', 'contact'];
+      const current = sections.find(section => {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          return rect.top <= 100 && rect.bottom >= 100;
+        }
+        return false;
+      });
+      if (current) setActiveSection(current);
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Dark mode system preference
-  useEffect(() => {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setDarkMode(true);
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setIsMenuOpen(false);
     }
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-      setDarkMode(e.matches);
-    });
-  }, []);
-
-  const focusAreas = [
-    {
-      icon: <FiUsers className="text-3xl mb-4 text-yellow-400" />,
-      title: "Partnership Building",
-      description: "Forging strategic alliances to expand Stellar's ecosystem across East Africa"
-    },
-    {
-      icon: <FiBook className="text-3xl mb-4 text-yellow-400" />,
-      title: "Education Initiatives",
-      description: "Empowering developers and businesses through blockchain education programs"
-    },
-    {
-      icon: <FiCode className="text-3xl mb-4 text-yellow-400" />,
-      title: "Developer Ecosystem",
-      description: "Connecting and supporting Stellar developers in the region"
-    }
-  ];
-
-  const particlesInit = async (engine) => {
-    await loadFull(engine);
   };
 
-  const connectWallet = () => {
-    setWalletConnected(true);
-    setTimeout(() => {
-      setWalletConnected(false);
-    }, 3000);
-  };
+  // X (Twitter) Icon Component
+  const XIcon = ({ size = 24, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  );
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-      <div className="dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 bg-white text-gray-900 dark:text-white font-sans transition-colors duration-500">
-        {/* Animated Particles Background */}
-        <div className="fixed inset-0 -z-10 opacity-20 dark:opacity-40">
-          <Particles
-            id="tsparticles"
-            init={particlesInit}
-            options={{
-              particles: {
-                number: { value: 30, density: { enable: true, value_area: 800 } },
-                color: { value: "#F5B700" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 4, random: true },
-                line_linked: { enable: true, distance: 150, color: "#F5B700", opacity: 0.2, width: 1 },
-                move: {
-                  enable: true,
-                  speed: 2,
-                  direction: "none",
-                  random: true,
-                  straight: false,
-                  out_mode: "out",
-                  bounce: false,
-                  attract: { enable: true, rotateX: 600, rotateY: 1200 }
-                }
-              },
-              interactivity: {
-                detect_on: "canvas",
-                events: {
-                  onhover: { enable: true, mode: "grab" },
-                  onclick: { enable: true, mode: "push" },
-                  resize: true
-                },
-                modes: {
-                  grab: { distance: 140, line_linked: { opacity: 1 } },
-                  push: { particles_nb: 4 }
-                }
-              },
-              retina_detect: true
-            }}
-          />
-        </div>
-
-        {/* Navigation */}
-        <motion.nav 
-          className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'py-3 dark:bg-gray-900/90 bg-white/90 backdrop-blur-md shadow-sm' : 'py-6'}`}
-          initial={{ y: -100 }}
-          animate={{ y: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        >
-          <div className="container mx-auto px-6 flex justify-between items-center">
-            <motion.div 
-              className="text-2xl font-bold tracking-tight"
-              whileHover={{ scale: 1.05 }}
-            >
-              <span className="text-yellow-400">Stellar</span> East Africa
-            </motion.div>
-            
-            <div className="hidden md:flex space-x-8 items-center">
-              {['home', 'leadership', 'initiatives', 'contact'].map((section) => (
-                <motion.a
-                  key={section}
-                  href={`#${section}`}
-                  className={`relative px-1 py-2 transition-colors ${activeSection === section ? 'text-yellow-400' : 'text-gray-700 dark:text-gray-300 hover:text-yellow-400'}`}
-                  onClick={() => setActiveSection(section)}
-                  whileHover={{ y: -2 }}
-                >
-                  {section.charAt(0).toUpperCase() + section.slice(1)}
-                  {activeSection === section && (
-                    <motion.span 
-                      className="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-400 rounded-full"
-                      layoutId="navIndicator"
-                    />
-                  )}
-                </motion.a>
-              ))}
-
-              <motion.button
-                onClick={() => setDarkMode(!darkMode)}
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 ml-4"
-                whileTap={{ scale: 0.9 }}
-              >
-                {darkMode ? '☀️' : '🌙'}
-              </motion.button>
-
-              <motion.button
-                onClick={connectWallet}
-                className={`px-4 py-2 rounded-lg font-medium ml-4 ${walletConnected ? 'bg-green-500 text-white' : 'bg-yellow-400 text-gray-900'}`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {walletConnected ? 'Connected ✓' : 'Connect Wallet'}
-              </motion.button>
-            </div>
-
-            <button 
-              className="md:hidden text-2xl z-50"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <FiX /> : <FiMenu />}
-            </button>
-
-            {/* Mobile Menu */}
-            <AnimatePresence>
-              {mobileMenuOpen && (
-                <motion.div 
-                  className="fixed inset-0 bg-gray-900/95 backdrop-blur-md flex flex-col items-center justify-center z-40"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  {['home', 'leadership', 'initiatives', 'contact'].map((section) => (
-                    <motion.a
-                      key={`mobile-${section}`}
-                      href={`#${section}`}
-                      className="text-2xl py-4 px-8 text-white hover:text-yellow-400"
-                      onClick={() => {
-                        setActiveSection(section);
-                        setMobileMenuOpen(false);
-                      }}
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.1 * ['home', 'leadership', 'initiatives', 'contact'].indexOf(section) }}
-                    >
-                      {section.charAt(0).toUpperCase() + section.slice(1)}
-                    </motion.a>
-                  ))}
-                  <div className="flex space-x-6 mt-8">
-                    <a href="#" className="text-gray-400 hover:text-yellow-400 transition-colors">
-                      <FiGithub size={24} />
-                    </a>
-                    <a href="#" className="text-gray-400 hover:text-yellow-400 transition-colors">
-                      <FiLinkedin size={24} />
-                    </a>
-                    <a href="#" className="text-gray-400 hover:text-yellow-400 transition-colors">
-                      <FiTwitter size={24} />
-                    </a>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.nav>
-
-        {/* Hero Section */}
-        <section id="home" className="min-h-screen flex items-center justify-center relative pt-20">
-          <div className="container mx-auto px-6 flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 mb-12 md:mb-0">
-              <motion.h1 
-                className="text-4xl md:text-6xl font-bold leading-tight mb-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <span className="text-yellow-400">Hi I'm Sarah Wahinya</span>
-              </motion.h1>
-              
-              <motion.h2 
-                className="text-2xl md:text-3xl text-gray-700 dark:text-gray-300 mb-8"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                President, <span className="text-yellow-400">Stellar East Africa Community</span>
-              </motion.h2>
-              
-              <motion.p 
-                className="text-lg text-gray-600 dark:text-gray-400 mb-10 max-w-lg"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                {welcomeMessage} Driving adoption and innovation of Stellar technology through partnerships, education, and ecosystem development across East Africa.
-              </motion.p>
-              
-              <motion.div 
-                className="flex flex-wrap gap-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-              >
-                <motion.a 
-                  href="#initiatives" 
-                  className="cta-primary flex items-center"
-                  whileHover={{ y: -2, boxShadow: "0 8px 25px rgba(245, 183, 0, 0.4)" }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Our Initiatives <FiArrowRight className="ml-2" />
-                </motion.a>
-                <motion.a 
-                  href="#contact" 
-                  className="cta-secondary flex items-center"
-                  whileHover={{ y: -2, backgroundColor: "rgba(245, 183, 0, 0.1)" }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Join Our Community
-                </motion.a>
-              </motion.div>
-            </div>
-
-            <div className="md:w-1/2 flex justify-center">
-              <motion.div 
-                className="relative"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                <img 
-                  src={madam}
-                  alt="Sarah Wahinya"
-                  className="w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-yellow-400 shadow-xl hover:shadow-2xl hover:shadow-yellow-400/30 transition-all"
-                />
-                <div className="absolute -z-10 top-0 left-0 w-full h-full rounded-full bg-yellow-400/20 blur-xl animate-pulse" />
-                <motion.div 
-                  className="absolute -bottom-4 -right-4 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-300 dark:border-gray-700"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  <span className="text-yellow-400 font-bold">Currently:</span>
-                  <p className="text-sm">Leading Digital Transformation</p>
-                </motion.div>
-              </motion.div>
-            </div>
-          </div>
-
-          <motion.div 
-            className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            <div className="w-8 h-14 rounded-3xl border-2 border-yellow-400 flex justify-center p-1">
-              <div className="w-2 h-2 rounded-full bg-yellow-400 animate-scroll" />
-            </div>
-          </motion.div>
-        </section>
-
-        {/* Leadership Focus Areas */}
-        <section id="leadership" className="py-20 dark:bg-gray-800/50 bg-gray-100 backdrop-blur-sm">
-          <div className="container mx-auto px-6">
-            <motion.div 
-              className="text-center mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Leadership <span className="text-yellow-400">Focus Areas</span>
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                Key priorities driving Stellar's growth in East Africa
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {focusAreas.map((area, index) => (
-                <motion.div 
-                  key={index}
-                  className="bg-white dark:bg-gray-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 hover:border-yellow-400 transition-all group text-center"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -10, boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)" }}
-                >
-                  {area.icon}
-                  <h3 className="text-xl font-bold mb-3 group-hover:text-yellow-400 transition-colors">
-                    {area.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    {area.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Community Initiatives */}
-        <section id="initiatives" className="py-20">
-          <div className="container mx-auto px-6">
-            <motion.div 
-              className="text-center mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Community <span className="text-yellow-400">Initiatives</span>
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                Programs driving Stellar adoption and education
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              <motion.div 
-                className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-yellow-400 transition-all"
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <div className="p-8">
-                  <div className="w-16 h-16 bg-yellow-400/10 rounded-lg flex items-center justify-center mb-6">
-                    <FiBook className="text-yellow-400 text-2xl" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4">Stellar Academy</h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6">
-                    Comprehensive training programs for developers and businesses to build on the Stellar network.
-                  </p>
-                  <motion.a 
-                    href="#" 
-                    className="inline-flex items-center text-yellow-400 hover:text-yellow-300 transition-colors"
-                    whileHover={{ x: 5 }}
-                  >
-                    Learn More <FiArrowRight className="ml-2" />
-                  </motion.a>
-                </div>
-              </motion.div>
-
-              <motion.div 
-                className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-yellow-400 transition-all"
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <div className="p-8">
-                  <div className="w-16 h-16 bg-yellow-400/10 rounded-lg flex items-center justify-center mb-6">
-                    <FiUsers className="text-yellow-400 text-2xl" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4">Developer Connect</h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6">
-                    Regular meetups and hackathons to foster collaboration among Stellar developers in the region.
-                  </p>
-                  <motion.a 
-                    href="#" 
-                    className="inline-flex items-center text-yellow-400 hover:text-yellow-300 transition-colors"
-                    whileHover={{ x: 5 }}
-                  >
-                    Join Events <FiArrowRight className="ml-2" />
-                  </motion.a>
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Upcoming Events */}
-            <motion.div 
-              className="bg-gradient-to-r from-yellow-400/10 to-gray-800/10 dark:from-yellow-400/5 dark:to-gray-800/20 p-8 rounded-xl border border-gray-200 dark:border-gray-700 mt-12"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              <h3 className="text-2xl font-bold mb-4 text-center">Upcoming Events</h3>
-              <div className="flex flex-col md:flex-row justify-center items-center gap-8">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-yellow-400 mb-2">
-                    <Suspense fallback="00">
-                      <Countdown 
-                        date={new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)} 
-                        renderer={({ days }) => days}
-                      />
-                    </Suspense>
-                  </div>
-                  <div className="text-gray-600 dark:text-gray-400">Days</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-yellow-400 mb-2">
-                    <Suspense fallback="00">
-                      <Countdown 
-                        date={new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)} 
-                        renderer={({ hours }) => hours}
-                      />
-                    </Suspense>
-                  </div>
-                  <div className="text-gray-600 dark:text-gray-400">Hours</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-yellow-400 mb-2">
-                    <Suspense fallback="00">
-                      <Countdown 
-                        date={new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)} 
-                        renderer={({ minutes }) => minutes}
-                      />
-                    </Suspense>
-                  </div>
-                  <div className="text-gray-600 dark:text-gray-400">Minutes</div>
-                </div>
-              </div>
-              <p className="text-center mt-6 text-gray-700 dark:text-gray-300">
-                Until the next Stellar East Africa Hackathon in Nairobi
-              </p>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Twitter Feed Section */}
-        <section className="py-12 bg-gray-100 dark:bg-gray-800">
-          <div className="container mx-auto px-6">
-            <h3 className="text-2xl font-bold mb-8 text-center">Latest from <span className="text-yellow-400">Our Community</span></h3>
-            <Suspense fallback={<div className="text-center py-8 text-yellow-400">Loading tweets...</div>}>
-              <TwitterFeed username="StellarEastAfrica" limit={3} />
-            </Suspense>
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section id="contact" className="py-20">
-          <div className="container mx-auto px-6">
-            <motion.div 
-              className="text-center mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Get <span className="text-yellow-400">Involved</span>
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                Join our growing community of developers and innovators
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-              >
-                <h3 className="text-2xl font-bold mb-6">Newsletter Signup</h3>
-                <form className="space-y-4">
-                  <div>
-                    <label htmlFor="name" className="block text-gray-700 dark:text-gray-300 mb-2">Name</label>
-                    <input 
-                      type="text" 
-                      id="name" 
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      placeholder="Your name"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-gray-700 dark:text-gray-300 mb-2">Email</label>
-                    <input 
-                      type="email" 
-                      id="email" 
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                  <motion.button
-                    type="submit"
-                    className="w-full cta-primary mt-6 flex items-center justify-center"
-                    whileHover={{ y: -2, boxShadow: "0 8px 25px rgba(245, 183, 0, 0.4)" }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Subscribe <FiArrowRight className="ml-2" />
-                  </motion.button>
-                </form>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-              >
-                <h3 className="text-2xl font-bold mb-6">Connect With Us</h3>
-                <div className="space-y-6">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 bg-yellow-400/10 p-3 rounded-lg mr-4">
-                      <FiUsers className="text-yellow-400 text-xl" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-lg">Community Forum</h4>
-                      <p className="text-gray-600 dark:text-gray-400">Join discussions with other Stellar developers</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 bg-yellow-400/10 p-3 rounded-lg mr-4">
-                      <FiCode className="text-yellow-400 text-xl" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-lg">GitHub</h4>
-                      <p className="text-gray-600 dark:text-gray-400">Contribute to our open-source projects</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 bg-yellow-400/10 p-3 rounded-lg mr-4">
-                      <FiBook className="text-yellow-400 text-xl" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-lg">Documentation</h4>
-                      <p className="text-gray-600 dark:text-gray-400">Learn how to build on Stellar</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex space-x-4 mt-8">
-                  <a href="#" className="social-icon">
-                    <FiGithub size={24} />
-                  </a>
-                  <a href="#" className="social-icon">
-                    <FiLinkedin size={24} />
-                  </a>
-                  <a href="#" className="social-icon">
-                    <FiTwitter size={24} />
-                  </a>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* Stellar Assistant Chatbot */}
-        <Suspense fallback={null}>
-          <StellarAssistant />
-        </Suspense>
-
-        {/* Footer */}
-        <footer className="dark:bg-gray-900/80 bg-gray-100 backdrop-blur-md py-12 border-t border-gray-200 dark:border-gray-800">
-          <div className="container mx-auto px-6">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="mb-6 md:mb-0">
-                <h3 className="text-2xl font-bold">
-                  <span className="text-yellow-400">Stellar</span> East Africa
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 mt-2">Driving blockchain innovation across the region</p>
-              </div>
-
-              <div className="flex space-x-6">
-                <a href="#" className="social-icon">
-                  <FiGithub size={24} />
-                </a>
-                <a href="#" className="social-icon">
-                  <FiLinkedin size={24} />
-                </a>
-                <a href="#" className="social-icon">
-                  <FiTwitter size={24} />
-                </a>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-300 dark:border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-500 text-sm mb-4 md:mb-0">
-                © {new Date().getFullYear()} Stellar East Africa Community. All rights reserved.
-              </p>
-              <div className="flex space-x-6">
-                <a href="#" className="text-gray-500 hover:text-yellow-400 text-sm transition-colors">
-                  Privacy Policy
-                </a>
-                <a href="#" className="text-gray-500 hover:text-yellow-400 text-sm transition-colors">
-                  Terms of Service
-                </a>
-              </div>
-            </div>
-          </div>
-        </footer>
+    <div className="min-h-screen bg-black text-white">
+      {/* Subtle background decoration */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
+        <div className="absolute top-20 right-20 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Global Styles */}
-      <style jsx global>{`
-        @keyframes float {
-          0% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
-          100% { transform: translateY(0) rotate(0deg); }
-        }
-        
-        @keyframes scroll {
-          0% { transform: translateY(0); opacity: 1; }
-          100% { transform: translateY(10px); opacity: 0; }
-        }
-        
-        .animate-scroll {
-          animation: scroll 2s infinite;
-        }
+      {/* Navigation */}
+      <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-gray-800 backdrop-blur-xl shadow-2xl border-b border-yellow-500/30' : 'bg-gray-700'}`}>
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex justify-between items-center h-24">
+            {/* Logo */}
+            <div className="flex-shrink-0 group cursor-pointer">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center font-bold text-black text-sm shadow-lg shadow-yellow-500/30 group-hover:scale-110 transition-transform">
+                  <Globe size={20} />
+                </div>
+                <h1 className="text-xl font-bold text-yellow-500 group-hover:text-yellow-400 transition-colors">
+                  Sarah Wahinya
+                </h1>
+              </div>
+            </div>
+            
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center gap-2 bg-yellow-500/5 backdrop-blur-md rounded-full px-2 py-2 border border-yellow-500/20">
+              {['home', 'about', 'leadership', 'impact', 'contact'].map((item) => (
+                <button
+                  key={item}
+                  onClick={() => scrollToSection(item)}
+                  className={`capitalize transition-all duration-300 font-medium px-6 py-2 rounded-full ${
+                    activeSection === item 
+                      ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/30' 
+                      : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-500/10'
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
 
-        .cta-primary {
-          display: inline-flex;
-          align-items: center;
-          padding: 0.75rem 1.5rem;
-          background-color: #F5B700;
-          color: #0D1A40;
-          border-radius: 0.5rem;
-          font-weight: 600;
-          transition: all 0.3s;
-        }
+            {/* Social Links Desktop */}
+            <div className="hidden md:flex items-center gap-3">
+              <a 
+                href="mailto:sarah@sarahwahinya.com"
+                className="p-2.5 bg-yellow-500/10 rounded-full border border-yellow-500/20 hover:bg-yellow-500/20 hover:border-yellow-500/40 transition-all hover:scale-110"
+                aria-label="Email"
+              >
+                <Mail size={18} className="text-yellow-500" />
+              </a>
+              <a 
+                href="https://linkedin.com/in/sarah-wahinya"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2.5 bg-yellow-500/10 rounded-full border border-yellow-500/20 hover:bg-yellow-500/20 hover:border-yellow-500/40 transition-all hover:scale-110"
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={18} className="text-yellow-500" />
+              </a>
+            </div>
 
-        .cta-secondary {
-          display: inline-flex;
-          align-items: center;
-          padding: 0.75rem 1.5rem;
-          border: 2px solid #F5B700;
-          color: #F5B700;
-          border-radius: 0.5rem;
-          font-weight: 600;
-          transition: all 0.3s;
-        }
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden p-2 text-yellow-500 hover:bg-yellow-500/10 rounded-lg transition-all"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
+        </div>
 
-        .social-icon {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          background-color: rgba(245, 183, 0, 0.1);
-          color: #F5B700;
-          transition: all 0.3s;
-        }
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-yellow-500/20 shadow-2xl">
+            <div className="px-6 py-6 space-y-3">
+              {['home', 'about', 'leadership', 'impact', 'contact'].map((item) => (
+                <button
+                  key={item}
+                  onClick={() => scrollToSection(item)}
+                  className={`block w-full text-left py-3 px-4 capitalize transition-all rounded-lg font-medium ${
+                    activeSection === item
+                      ? 'bg-yellow-500 text-black'
+                      : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-500/10'
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+              <div className="pt-4 border-t border-yellow-500/20 flex gap-3">
+                <a 
+                  href="mailto:sarah@sarahwahinya.com"
+                  className="flex-1 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20 hover:bg-yellow-500/20 transition-all text-center"
+                >
+                  <Mail size={20} className="text-yellow-500 mx-auto" />
+                </a>
+                <a 
+                  href="https://linkedin.com/in/sarah-wahinya"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20 hover:bg-yellow-500/20 transition-all text-center"
+                >
+                  <Linkedin size={20} className="text-yellow-500 mx-auto" />
+                </a>
+                <a 
+                  href="https://x.com/sarahwahinya"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20 hover:bg-yellow-500/20 transition-all text-center"
+                >
+                  <XIcon size={20} className="text-yellow-500 mx-auto" />
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+      </nav>
 
-        .social-icon:hover {
-          background-color: rgba(245, 183, 0, 0.2);
-          transform: translateY(-3px);
-        }
+      {/* Hero Section */}
+      <section id="home" className="min-h-screen flex items-center justify-center px-4 pt-20 relative">
+        <div className="max-w-6xl mx-auto text-center relative z-10">
+          <div className="mb-8 relative inline-block">
+            <div className="w-48 h-48 mx-auto rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600 p-0.5 shadow-2xl shadow-yellow-500/30">
+              <div className="w-full h-full rounded-full bg-black overflow-hidden border-2 border-yellow-500/30">
+                <img 
+                  src={pic1}
+                  alt="Sarah Wahinya"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <div className="absolute -bottom-2 -right-2 w-14 h-14 bg-yellow-500 rounded-full flex items-center justify-center shadow-lg border-2 border-black">
+              <Globe className="text-black" size={24} />
+            </div>
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-bold mb-4 text-yellow-500">
+            Sarah Wahinya
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-gray-300 mb-3">
+            President, Stellar East Africa | Founder, Zu'Co Ltd
+          </p>
+          
+          <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-3xl mx-auto">
+            Driving blockchain adoption across East Africa and building inclusive pathways 
+            for African talent to thrive in global Web3
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-3 mb-10">
+            <span className="px-5 py-2 bg-yellow-500/10 rounded-full border border-yellow-500/30 text-yellow-500 font-medium">
+              Blockchain Leader
+            </span>
+            <span className="px-5 py-2 bg-yellow-500/10 rounded-full border border-yellow-500/30 text-yellow-500 font-medium">
+              Ecosystem Architect
+            </span>
+            <span className="px-5 py-2 bg-yellow-500/10 rounded-full border border-yellow-500/30 text-yellow-500 font-medium">
+              Global Connector
+            </span>
+          </div>
 
-        @media (prefers-reduced-motion: reduce) {
-          * {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-            scroll-behavior: auto !important;
-          }
-        }
-      `}</style>
+          <div className="flex justify-center gap-4">
+            <a 
+              href="mailto:sarah@sarahwahinya.com" 
+              className="p-3 bg-yellow-500/10 rounded-full border border-yellow-500/30 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all"
+              aria-label="Email"
+            >
+              <Mail size={24} className="text-yellow-500" />
+            </a>
+            <a 
+              href="https://linkedin.com/in/sarah-wahinya" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 bg-yellow-500/10 rounded-full border border-yellow-500/30 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all"
+              aria-label="LinkedIn"
+            >
+              <Linkedin size={24} className="text-yellow-500" />
+            </a>
+            <a 
+              href="https://x.com/sarahwahinya" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 bg-yellow-500/10 rounded-full border border-yellow-500/30 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all"
+              aria-label="X (Twitter)"
+            >
+              <XIcon size={24} className="text-yellow-500" />
+            </a>
+          </div>
+
+          <button
+            onClick={() => scrollToSection('about')}
+            className="mt-12 animate-bounce"
+          >
+            <ChevronDown size={32} className="text-yellow-500" />
+          </button>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="min-h-screen flex items-center py-20 px-4 relative">
+        <div className="max-w-6xl mx-auto relative z-10">
+          <h2 className="text-4xl md:text-5xl font-bold mb-12 text-center">
+            About <span className="text-yellow-500">Me</span>
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <p className="text-lg text-gray-300 leading-relaxed">
+                As an African woman, I'm on a mission to transform the blockchain landscape 
+                across East Africa. Through my role as President of Stellar East Africa and as Founder 
+                of Zu'Co Ltd, I'm bridging the gap between African innovation and global Web3 opportunities.
+              </p>
+              
+              <p className="text-lg text-gray-300 leading-relaxed">
+                I believe in the power of connection and collaboration. As a passionate traveler and 
+                ecosystem architect, I've dedicated my career to creating inclusive pathways that enable 
+                African talent to not just participate, but to lead in the global blockchain revolution.
+              </p>
+
+              <p className="text-lg text-gray-300 leading-relaxed">
+                My work focuses on education, community building, and creating sustainable blockchain 
+                solutions that address real African challenges while connecting our innovators to the 
+                world stage.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="p-6 bg-yellow-500/5 rounded-xl border border-yellow-500/20 hover:border-yellow-500/40 transition-all">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-yellow-500/10 rounded-lg">
+                    <Globe size={28} className="text-yellow-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2 text-yellow-500">Global Vision</h3>
+                    <p className="text-gray-400">Connecting African innovation with worldwide Web3 opportunities</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 bg-yellow-500/5 rounded-xl border border-yellow-500/20 hover:border-yellow-500/40 transition-all">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-yellow-500/10 rounded-lg">
+                    <Users size={28} className="text-yellow-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2 text-yellow-500">Community First</h3>
+                    <p className="text-gray-400">Building inclusive ecosystems for African blockchain talent</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 bg-yellow-500/5 rounded-xl border border-yellow-500/20 hover:border-yellow-500/40 transition-all">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-yellow-500/10 rounded-lg">
+                    <Award size={28} className="text-yellow-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2 text-yellow-500">Impact Driven</h3>
+                    <p className="text-gray-400">Creating real solutions for African challenges through blockchain</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Leadership Section */}
+      <section id="leadership" className="min-h-screen flex items-center py-20 px-4 relative">
+        <div className="max-w-6xl mx-auto w-full relative z-10">
+          <h2 className="text-4xl md:text-5xl font-bold mb-12 text-center">
+            <span className="text-yellow-500">Leadership</span> Roles
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="p-8 bg-yellow-500/5 rounded-2xl border border-yellow-500/30 hover:border-yellow-500/50 transition-all">
+              <div className="w-14 h-14 bg-yellow-500/10 rounded-lg flex items-center justify-center mb-6">
+                <Globe size={28} className="text-yellow-500" />
+              </div>
+              <h3 className="text-2xl font-bold mb-2">President</h3>
+              <p className="text-xl text-yellow-500 mb-4">Stellar East Africa</p>
+              <p className="text-gray-400 leading-relaxed">
+                Leading the strategic vision and growth of Stellar's blockchain ecosystem across 
+                East Africa. Fostering partnerships, driving adoption, and empowering developers 
+                and businesses to build on the Stellar network.
+              </p>
+            </div>
+
+            <div className="p-8 bg-yellow-500/5 rounded-2xl border border-yellow-500/30 hover:border-yellow-500/50 transition-all">
+              <div className="w-14 h-14 bg-yellow-500/10 rounded-lg flex items-center justify-center mb-6">
+                <Briefcase size={28} className="text-yellow-500" />
+              </div>
+              <h3 className="text-2xl font-bold mb-2">Founder & CEO</h3>
+              <p className="text-xl text-yellow-500 mb-4">Zu'Co Ltd</p>
+              <p className="text-gray-400 leading-relaxed">
+                Building innovative blockchain solutions and consulting services that bridge 
+                traditional African businesses with Web3 technologies. Creating sustainable 
+                pathways for digital transformation and financial inclusion.
+              </p>
+            </div>
+          </div>
+
+          <div className="p-8 bg-yellow-500/5 rounded-2xl border border-yellow-500/20">
+            <h3 className="text-2xl font-bold mb-8 text-center">Core Focus Areas</h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="text-center p-6 rounded-xl border border-yellow-500/20 hover:border-yellow-500/40 transition-all">
+                <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Users size={24} className="text-yellow-500" />
+                </div>
+                <h4 className="font-semibold mb-2 text-yellow-500">Community Building</h4>
+                <p className="text-sm text-gray-400">Growing vibrant blockchain communities across East Africa</p>
+              </div>
+              <div className="text-center p-6 rounded-xl border border-yellow-500/20 hover:border-yellow-500/40 transition-all">
+                <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Award size={24} className="text-yellow-500" />
+                </div>
+                <h4 className="font-semibold mb-2 text-yellow-500">Education & Training</h4>
+                <p className="text-sm text-gray-400">Empowering African talent with Web3 skills and knowledge</p>
+              </div>
+              <div className="text-center p-6 rounded-xl border border-yellow-500/20 hover:border-yellow-500/40 transition-all">
+                <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Globe size={24} className="text-yellow-500" />
+                </div>
+                <h4 className="font-semibold mb-2 text-yellow-500">Global Partnerships</h4>
+                <p className="text-sm text-gray-400">Connecting African innovation with international opportunities</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Impact Section */}
+      <section id="impact" className="min-h-screen flex items-center py-20 px-4 relative">
+        <div className="max-w-6xl mx-auto w-full relative z-10">
+          <h2 className="text-4xl md:text-5xl font-bold mb-12 text-center">
+            Creating <span className="text-yellow-500">Impact</span>
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="p-8 bg-yellow-500/5 rounded-xl border border-yellow-500/30 text-center hover:border-yellow-500/50 transition-all">
+              <div className="text-5xl font-bold text-yellow-500 mb-2">1000+</div>
+              <div className="text-gray-300">Developers Trained</div>
+            </div>
+            <div className="p-8 bg-yellow-500/5 rounded-xl border border-yellow-500/30 text-center hover:border-yellow-500/50 transition-all">
+              <div className="text-5xl font-bold text-yellow-500 mb-2">50+</div>
+              <div className="text-gray-300">Partnerships Formed</div>
+            </div>
+            <div className="p-8 bg-yellow-500/5 rounded-xl border border-yellow-500/30 text-center hover:border-yellow-500/50 transition-all">
+              <div className="text-5xl font-bold text-yellow-500 mb-2">10</div>
+              <div className="text-gray-300">Countries Reached</div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="p-6 bg-yellow-500/5 rounded-xl border-l-4 border-yellow-500 hover:bg-yellow-500/10 transition-all">
+              <h3 className="text-xl font-semibold mb-3 flex items-center gap-3 text-yellow-500">
+                <ArrowRight size={24} />
+                Blockchain Adoption
+              </h3>
+              <p className="text-gray-400">
+                Spearheading initiatives that make blockchain technology accessible and practical 
+                for East African businesses, from SMEs to large enterprises, driving real-world adoption 
+                and digital transformation.
+              </p>
+            </div>
+
+            <div className="p-6 bg-yellow-500/5 rounded-xl border-l-4 border-yellow-500 hover:bg-yellow-500/10 transition-all">
+              <h3 className="text-xl font-semibold mb-3 flex items-center gap-3 text-yellow-500">
+                <ArrowRight size={24} />
+                Talent Development
+              </h3>
+              <p className="text-gray-400">
+                Creating comprehensive training programs and mentorship opportunities that equip 
+                African developers and entrepreneurs with the skills needed to excel in the global 
+                Web3 ecosystem.
+              </p>
+            </div>
+
+            <div className="p-6 bg-yellow-500/5 rounded-xl border-l-4 border-yellow-500 hover:bg-yellow-500/10 transition-all">
+              <h3 className="text-xl font-semibold mb-3 flex items-center gap-3 text-yellow-500">
+                <ArrowRight size={24} />
+                Financial Inclusion
+              </h3>
+              <p className="text-gray-400">
+                Leveraging blockchain technology to create inclusive financial solutions that serve 
+                the unbanked and underbanked populations across East Africa, promoting economic 
+                empowerment and opportunity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="min-h-screen flex items-center py-20 px-4 relative">
+        <div className="max-w-4xl mx-auto w-full text-center relative z-10">
+          <h2 className="text-4xl md:text-5xl font-bold mb-8">
+            Let's <span className="text-yellow-500">Connect</span>
+          </h2>
+          
+          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+            Interested in blockchain adoption in East Africa? Looking to collaborate on Web3 initiatives? 
+            Let's build the future together.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <a 
+              href="mailto:sarah@sarahwahinya.com" 
+              className="p-6 bg-yellow-500/5 rounded-xl border border-yellow-500/30 hover:border-yellow-500/50 hover:bg-yellow-500/10 transition-all group"
+            >
+              <Mail size={32} className="text-yellow-500 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2 text-yellow-500">Email</h3>
+              <p className="text-sm text-gray-400">sarah@sarahwahinya.com</p>
+            </a>
+
+            <a 
+              href="https://linkedin.com/in/sarah-wahinya" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-6 bg-yellow-500/5 rounded-xl border border-yellow-500/30 hover:border-yellow-500/50 hover:bg-yellow-500/10 transition-all group"
+            >
+              <Linkedin size={32} className="text-yellow-500 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2 text-yellow-500">LinkedIn</h3>
+              <p className="text-sm text-gray-400">Connect professionally</p>
+            </a>
+
+            <a 
+              href="https://x.com/sarahwahinya" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-6 bg-yellow-500/5 rounded-xl border border-yellow-500/30 hover:border-yellow-500/50 hover:bg-yellow-500/10 transition-all group"
+            >
+              <XIcon size={32} className="text-yellow-500 mx-auto" />
+              <h3 className="font-semibold mb-2 text-yellow-500 mt-3">X (Twitter)</h3>
+              <p className="text-sm text-gray-400">Follow my journey</p>
+            </a>
+          </div>
+
+          <div className="p-8 bg-yellow-500/5 rounded-2xl border border-yellow-500/30">
+            <h3 className="text-2xl font-bold mb-6">Available For</h3>
+            <div className="flex flex-wrap justify-center gap-3">
+              <span className="px-5 py-2 bg-black rounded-full border border-yellow-500/40 text-yellow-500 font-medium">Speaking Engagements</span>
+              <span className="px-5 py-2 bg-black rounded-full border border-yellow-500/40 text-yellow-500 font-medium">Consulting</span>
+              <span className="px-5 py-2 bg-black rounded-full border border-yellow-500/40 text-yellow-500 font-medium">Partnerships</span>
+              <span className="px-5 py-2 bg-black rounded-full border border-yellow-500/40 text-yellow-500 font-medium">Mentorship</span>
+              <span className="px-5 py-2 bg-black rounded-full border border-yellow-500/40 text-yellow-500 font-medium">Collaborations</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 px-4 border-t border-yellow-500/20 relative z-10">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Star className="text-yellow-500" size={16} />
+            <p className="text-yellow-500 font-medium">&copy; 2025 Sarah Wahinya. All rights reserved.</p>
+            <Star className="text-yellow-500" size={16} />
+          </div>
+          <p className="text-sm text-gray-400 mt-2">Building the future of blockchain in East Africa</p>
+        </div>
+      </footer>
     </div>
   );
-};
-
-// Mock function for geolocation
-const getMockCountry = (coords) => {
-  const countries = ['Kenya', 'Tanzania', 'Uganda', 'Rwanda', 'Burundi', 'South Sudan'];
-  return countries[Math.floor(Math.random() * countries.length)];
-};
-
-export default LandingPage;
+}
