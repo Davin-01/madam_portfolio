@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Linkedin, Mail, ChevronDown, Globe, Users, Briefcase, Award, ArrowRight, Star } from 'lucide-react';
+import { Menu, X, Linkedin, Mail, ChevronDown, Globe, Users, Briefcase, Award, ArrowRight, Star, Sparkle } from 'lucide-react';
 import pic1 from '../assets/madam.jpeg';
 
 export default function Portfolio() {
@@ -58,7 +58,7 @@ export default function Portfolio() {
             <div className="flex-shrink-0 group cursor-pointer">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center font-bold text-black text-sm shadow-lg shadow-yellow-500/30 group-hover:scale-110 transition-transform">
-                  <Globe size={20} />
+                  <Sparkle size={20} />
                 </div>
                 <h1 className="text-xl font-bold text-yellow-500 group-hover:text-yellow-400 transition-colors">
                   Sarah Wahinya
@@ -86,7 +86,7 @@ export default function Portfolio() {
             {/* Social Links Desktop */}
             <div className="hidden md:flex items-center gap-3">
               <a 
-                href="mailto:sarah@sarahwahinya.com"
+                href="mailto:sarahwahinya1@gmail.com"
                 className="p-2.5 bg-yellow-500/10 rounded-full border border-yellow-500/20 hover:bg-yellow-500/20 hover:border-yellow-500/40 transition-all hover:scale-110"
                 aria-label="Email"
               >
@@ -132,7 +132,7 @@ export default function Portfolio() {
               ))}
               <div className="pt-4 border-t border-yellow-500/20 flex gap-3">
                 <a 
-                  href="mailto:sarah@sarahwahinya.com"
+                  href="mailto:sarahwahinya1@gmail.com"
                   className="flex-1 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20 hover:bg-yellow-500/20 transition-all text-center"
                 >
                   <Mail size={20} className="text-yellow-500 mx-auto" />
@@ -204,7 +204,7 @@ export default function Portfolio() {
 
           <div className="flex justify-center gap-4">
             <a 
-              href="mailto:sarah@sarahwahinya.com" 
+              href="mailto:sarahwahinya1@gmail.com" 
               className="p-3 bg-yellow-500/10 rounded-full border border-yellow-500/30 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all"
               aria-label="Email"
             >
@@ -448,7 +448,7 @@ export default function Portfolio() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             <a 
-              href="mailto:sarah@sarahwahinya.com" 
+              href="mailto:sarahwahinya1@gmail.com" 
               className="p-6 bg-yellow-500/5 rounded-xl border border-yellow-500/30 hover:border-yellow-500/50 hover:bg-yellow-500/10 transition-all group"
             >
               <Mail size={32} className="text-yellow-500 mx-auto mb-3" />
